@@ -1,0 +1,8 @@
+# 数据库配置
+HOSTNAME = "10.197.67.12"
+PORT = 3306
+USERNAME = "root"
+PASSWORD = "123456"
+DATABASE = "biteacher"
+DB_URI = 'mysql+pymysql://{}:{}@{}:{}/{}?charset=utf8'.format(USERNAME,PASSWORD,HOSTNAME,PORT,DATABASE)
+SQLALCHEMY_DATABASE_URI = DB_URI
