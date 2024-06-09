@@ -1,43 +1,29 @@
-# 1. debug 模式（无需重新启动项目，直接刷新就可以看到效果；此外开发的时候在浏览器上就可以看到出错信息）
-# 方法：进入 Edit Configuration ，勾选即可
-
-
-# 2. 修改 host
-# 主要作用：让其他电脑能够访问到此电脑上的项目
-# 方法：Edit Configuration 中 Additional Options 添加：--host=0.0.0.0
-
-# 3. 修改端口号
-# 方法：Edit Configuration 中 Additional Options 添加：--port=8000
-
-
-# __name__ represents the current module
-# 1. 出现 bug 可以快速定位
-# 2. 对于寻找模版文件有一个相对路径
-
-from flask import Flask, request, render_template
-from exts import db
-from sqlalchemy import text
+from flask import Flask, render_template, request
 import config
-from models import UserModel, UserInfoModel, Reply, Teacher
+from exts import db, mail
+from models import UserModel
+from models import UserInfoModel
+from models import Reply
+from models import Teacher
+from blueprints.user import bp as user_bp
+from blueprints.auth import bp as auth_bp
+from blueprints.teacher import bp as teacher_bp
+from sqlalchemy import text
 import os
-import datetime
+from flask_jwt_extended import create_access_token
+from flask_migrate import Migrate
+
+
 
 app = Flask(__name__)
+app.config['JWT_SECRET_KEY'] = 'my_secret_key222'
 app.config.from_object(config)
 db.init_app(app)
-
-
-# 数据库连接测试
-# db1 = SQLAlchemy(app)
-# with app.app_context():
-#     with db1.engine.connect() as conn:
-#         rs = conn.execute(text("select 1"))
-#         print(rs.fetchall())
-
-
-# url: http[80]/https[443]://qq.com:443/path
-# url 与视图：path 与视图
-# 创建路由和视图的映射，/ 代表根路由
+mail.init_app(app)
+migrate = Migrate(app, db)
+app.register_blueprint(user_bp)
+app.register_blueprint(auth_bp)
+app.register_blueprint(teacher_bp)
 
 
 @app.route('/')
@@ -126,8 +112,6 @@ def showComment(teacherid = 1):
 
     return "Teacher comments"
 
-def addToCollection(code, ):
-
 
 if __name__ == '__main__':
-    app.run()
+    app.run(host="0.0.0.0", debug=True)
