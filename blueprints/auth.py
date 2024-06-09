@@ -7,6 +7,11 @@ import random
 from models import EmailCaptureModel
 from .forms import RegisterForm
 from models import UserModel
+from models import Captcha
+from models import UserInfoModel
+from models import bearertoken
+from flask_jwt_extended import create_access_token
+import json
 from .forms import LoginForm
 from werkzeug.security import generate_password_hash
 
@@ -18,13 +23,18 @@ def index():
     return "你好"
 
 @bp.route("/login", methods=['GET', 'POST'])
-def login(account="001", password="1234"):
-
+def login(account="111", password="1234"):
+    # username = json.dumps(account)
     user = UserModel.query.filter_by(account=account, password=password).first()
     if not user:
-        return jsonify({"code": 400, "message": "失败", "data": None})
+        return jsonify({"success": False, "token": "有问题"}), 400
     else:
-        return jsonify({"success": True, "token":})
+        access_token = create_access_token(identity=account)
+        token = bearertoken(account=account, token=access_token)
+        db.session.add(token)
+        db.session.commit()
+        #return access_token
+        return jsonify({"success": True, "token": access_token}), 200
 
 
 
@@ -32,27 +42,18 @@ def login(account="001", password="1234"):
 
 # 注册函数
 @bp.route("/register", methods=['GET', 'POST'])
-def register():
-    # 如何验证验证码是否正确
-    # 表单验证flask-wtf
-    if request.method == 'GET':
-        # user = UserModel(account="account", password="password")
-        # db.session.add(user)
-        # db.session.commit()
-        # return "注册成功"
-        return render_template("register.html")
-    else:
-        form = RegisterForm(request.form)
-        if form.validate():
-            account = form.email.data
-            password = form.email.data
-            user = UserModel(account=account, password=password)
-            db.session.add(user)
-            db.session.commit()
-            return redirect(url_for("auth.login"))
-        else:
-            print(form.errors)
-            return redirect(url_for("auth.register"))
+def register(phone="7891", captcha="345", password="nihao", confirmPassword="nihao"):
+   user1 = Captcha.query.filter_by(account=phone).first()
+   chap = user1.captcha
+   if chap == captcha and password==confirmPassword:
+       user = UserModel(account=phone, password=password)
+       db.session.add(user)
+       userinfo = UserInfoModel()
+       db.session.add(userinfo)
+       db.session.commit()
+       return jsonify({"success": True, "message": "注册成功"})
+   else:
+       return jsonify({"success": False, "message": "注册失败"})
 
 
 @bp.route("/capture/email")

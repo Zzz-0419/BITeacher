@@ -13,6 +13,19 @@ class UserModel(db.Model):
     # email = db.Column(db.String(100), nullable=False, unique=True)
     # join_time = db.Column(db.DateTime, default=datetime.now)
 
+
+class bearertoken(db.Model):
+    __tablename__ = "token_user"
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    account = db.Column(db.String(100), nullable=False)
+    token = db.Column(db.String(1000), nullable=False)
+
+class Captcha(db.Model):
+    __tablename__ = "captcha_user"
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    account = db.Column(db.String(100), nullable=False)
+    captcha = db.Column(db.String(100), nullable=False)
+
 class UserInfoModel(db.Model):
     __tablename__ = "userinfo"
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -20,6 +33,13 @@ class UserInfoModel(db.Model):
     wechat = db.Column(db.String(100), nullable=True, unique=True)
     qq = db.Column(db.String(100), nullable=True, unique=True)
     email = db.Column(db.String(100), nullable=True, unique=True)
+
+
+class UserCollection(db.Model):
+    __tablename__ = "collection"
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    use_id = db.Column(db.Integer, nullable=True, unique=True)
+    collection = db.Column(db.Integer, nullable=True, unique=True)
 
 
 # reply.information可以访问用户具体信息
@@ -42,6 +62,8 @@ class Teacher(db.Model):
     __tablename__ = "teacher"
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     info_path = db.Column(db.String(100))
+    eval_num = db.Column(db.Integer, default=0)
+    score = db.Column(db.Float,default=0.0)
 
 class CollegeTeacher(db.Model):
     __tablename__ = "collegeteacher"
